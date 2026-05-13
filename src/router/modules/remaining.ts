@@ -32,6 +32,12 @@ export default [
     }
   },
   {
+    path: "/tg/holding/:chatId",
+    name: "TgHoldingDetail",
+    component: () => import("@/views/tg/holding-detail.vue"),
+    meta: { title: "持股明細", showLink: false }
+  },
+  {
     path: "/redirect",
     component: Layout,
     meta: {
