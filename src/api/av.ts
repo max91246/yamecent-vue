@@ -6,6 +6,8 @@ type RT = {
   data?: { list: any[]; total: number; pageSize: number; currentPage: number };
 };
 
+export const getPopularTags = () =>
+  http.request<{ code: number; data?: string[] }>("get", `${BASE}/popular-tags`);
 export const getVideoList = (data?: object) =>
   http.request<RT>("post", `${BASE}/videos`, { data });
 export const updateVideo = (data: any) =>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { getVideoList, deleteVideo } from "@/api/av";
+import { getVideoList, deleteVideo, getPopularTags } from "@/api/av";
 
 defineOptions({ name: "AvVideo" });
 
@@ -12,8 +12,16 @@ const searchForm = reactive({
   code: "",
   actress: "",
   studio: "",
-  is_uncensored: ""
+  is_uncensored: "",
+  tags: [] as string[]
 });
+
+const popularTags = ref<string[]>([]);
+
+async function loadTags() {
+  const res = await getPopularTags();
+  if (res.code === 0) popularTags.value = res.data ?? [];
+}
 
 async function fetchList() {
   loading.value = true;
@@ -35,7 +43,8 @@ function resetSearch() {
     code: "",
     actress: "",
     studio: "",
-    is_uncensored: ""
+    is_uncensored: "",
+    tags: []
   });
   onSearch();
 }
@@ -50,25 +59,29 @@ async function handleDelete(row: any) {
     fetchList();
   }
 }
-onMounted(fetchList);
+onMounted(() => {
+  loadTags();
+  fetchList();
+});
 </script>
 
 <template>
   <div class="p-4">
     <el-form :inline="true" :model="searchForm" class="mb-4">
-      <el-form-item label="番號"
-        ><el-input
+      <el-form-item label="番號">
+        <el-input
           v-model="searchForm.code"
           placeholder="如 SSIS-001"
           clearable
           class="w-36!"
-      /></el-form-item>
-      <el-form-item label="女優"
-        ><el-input v-model="searchForm.actress" clearable class="w-36!"
-      /></el-form-item>
-      <el-form-item label="片商"
-        ><el-input v-model="searchForm.studio" clearable class="w-36!"
-      /></el-form-item>
+        />
+      </el-form-item>
+      <el-form-item label="女優">
+        <el-input v-model="searchForm.actress" clearable class="w-36!" />
+      </el-form-item>
+      <el-form-item label="片商">
+        <el-input v-model="searchForm.studio" clearable class="w-36!" />
+      </el-form-item>
       <el-form-item label="無碼">
         <el-select
           v-model="searchForm.is_uncensored"
@@ -76,9 +89,27 @@ onMounted(fetchList);
           clearable
           class="w-24!"
         >
-          <el-option label="無碼" :value="1" /><el-option
-            label="有碼"
-            :value="0"
+          <el-option label="無碼" :value="1" />
+          <el-option label="有碼" :value="0" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="標籤">
+        <el-select
+          v-model="searchForm.tags"
+          multiple
+          filterable
+          allow-create
+          collapse-tags
+          collapse-tags-tooltip
+          placeholder="可選多個標籤"
+          class="w-56!"
+          @change="onSearch"
+        >
+          <el-option
+            v-for="tag in popularTags"
+            :key="tag"
+            :label="tag"
+            :value="tag"
           />
         </el-select>
       </el-form-item>
