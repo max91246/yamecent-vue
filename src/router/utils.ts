@@ -333,8 +333,12 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
       v.component = undefined;
     } else {
       // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会跟path保持一致）
+      // 加上 .vue 後綴精確比對，避免 tg/holding 誤匹配 tg/holding-detail.vue
+      const comp = v.component as string;
       const index = v?.component
-        ? modulesRoutesKeys.findIndex(ev => ev.includes(v.component as any))
+        ? (modulesRoutesKeys.findIndex(ev => ev.includes(`/${comp}.vue`)) !== -1
+            ? modulesRoutesKeys.findIndex(ev => ev.includes(`/${comp}.vue`))
+            : modulesRoutesKeys.findIndex(ev => ev.includes(comp)))
         : modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
       v.component = modulesRoutes[modulesRoutesKeys[index]];
     }
