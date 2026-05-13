@@ -1,5 +1,6 @@
 export default {
   path: "/log",
+  redirect: "/log/index",
   meta: { title: "系統日誌", icon: "ri:file-list-3-line", rank: 8 },
   children: [
     {

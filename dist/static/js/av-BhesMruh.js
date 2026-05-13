@@ -1,0 +1,1 @@
+import{T as e}from"./index-Bh-jnakO.js";var t=`/api/admin/av`,n=n=>e.request(`post`,`${t}/videos`,{data:n}),r=n=>e.request(`delete`,`${t}/videos/${n}`),i=n=>e.request(`post`,`${t}/actresses`,{data:n}),a=n=>e.request(`delete`,`${t}/actresses/${n}`);export{n as i,r as n,i as r,a as t};
