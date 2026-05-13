@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
+import { useRoute } from "vue-router";
 import * as echarts from "echarts";
 import {
   getStockQuote,
@@ -11,7 +12,8 @@ import {
 
 defineOptions({ name: "StockQuery" });
 
-const code = ref("");
+const route = useRoute();
+const code  = ref("");
 
 // 各區塊獨立 loading + 資料
 const quoteLoading  = ref(false);
@@ -136,7 +138,13 @@ function renderChart() {
 }
 
 function onResize() { chart?.resize(); }
-onMounted(() => window.addEventListener("resize", onResize));
+onMounted(() => {
+  window.addEventListener("resize", onResize);
+  if (route.query.code) {
+    code.value = route.query.code as string;
+    doQuery();
+  }
+});
 onBeforeUnmount(() => { window.removeEventListener("resize", onResize); chart?.dispose(); });
 
 function cc(val: number | null) {
