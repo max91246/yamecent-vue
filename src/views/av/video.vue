@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { getVideoList, deleteVideo, getPopularTags } from "@/api/av";
 
 defineOptions({ name: "AvVideo" });
 
+const route = useRoute();
 const loading = ref(false);
 const dataList = ref([]);
 const pagination = reactive({ total: 0, pageSize: 20, currentPage: 1 });
@@ -60,6 +62,9 @@ async function handleDelete(row: any) {
   }
 }
 onMounted(() => {
+  if (route.query.actress) {
+    searchForm.actress = route.query.actress as string;
+  }
   loadTags();
   fetchList();
 });
