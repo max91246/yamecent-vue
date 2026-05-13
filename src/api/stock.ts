@@ -9,3 +9,5 @@ export const getDisposalList = (data?: object) =>
   http.request<RT>("post", `${BASE}/disposals`, { data });
 export const getOilPriceList = (data?: object) =>
   http.request<RT>("post", `${BASE}/oil-prices`, { data });
+export const getStockQuery = (code: string) =>
+  http.request<{ code: number; data?: any }>("get", `${BASE}/query`, { params: { code } });

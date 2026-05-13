@@ -1,0 +1,1 @@
+import{Ho as e}from"./index-DGkEsG4h.js";var t=`/api/admin/stock`,n=n=>e.request(`post`,`${t}/disposals`,{data:n}),r=n=>e.request(`post`,`${t}/oil-prices`,{data:n}),i=n=>e.request(`get`,`${t}/query`,{params:{code:n}});export{r as n,i as r,n as t};
