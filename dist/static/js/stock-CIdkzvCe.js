@@ -1,0 +1,1 @@
+import{T as e}from"./index-CM4TlolU.js";var t=`/api/admin/stock`,n=n=>e.request(`post`,`${t}/disposals`,{data:n}),r=n=>e.request(`post`,`${t}/oil-prices`,{data:n});export{r as n,n as t};
