@@ -38,12 +38,6 @@ export default [
     meta: { title: "持股明細", showLink: false }
   },
   {
-    path: "/log/index",
-    name: "LogViewer",
-    component: () => import("@/views/log/index.vue"),
-    meta: { title: "日誌查看", showLink: false }
-  },
-  {
     path: "/redirect",
     component: Layout,
     meta: {
