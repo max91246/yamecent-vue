@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { getLogFiles, getLogEntries } from "@/api/log";
 
 defineOptions({ name: "LogViewer" });
 
 const filesLoading = ref(false);
 const entriesLoading = ref(false);
-const grouped = ref<Record<string, any[]>>({});
+const allFiles = ref<any[]>([]);
 const selectedFile = ref("");
 const entries = ref<any[]>([]);
 const pagination = reactive({ total: 0, page: 1, pageSize: 50 });
@@ -22,12 +22,13 @@ const severityColors: Record<string, string> = {
   NOTICE:    "primary",
 };
 
-const channels = computed(() => Object.keys(grouped.value).sort());
-
 async function loadFiles() {
   filesLoading.value = true;
   const res = await getLogFiles();
-  if (res.code === 0) grouped.value = res.data.grouped;
+  if (res.code === 0) {
+    // 平鋪所有檔案，依最近修改時間排序
+    allFiles.value = res.data.files;
+  }
   filesLoading.value = false;
 }
 
@@ -64,30 +65,27 @@ function formatContext(ctx: any): string {
 
 onMounted(async () => {
   await loadFiles();
-  // 預設選最新的 laravel.log 或第一個檔
-  const allFiles = Object.values(grouped.value).flat();
-  if (allFiles.length) selectFile(allFiles[0].name);
+  if (allFiles.value.length) selectFile(allFiles.value[0].name);
 });
 </script>
 
 <template>
   <div class="flex h-full gap-0" style="height: calc(100vh - 120px)">
-    <!-- 左側：檔案列表 -->
-    <div class="w-56 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+    <!-- 左側：檔案列表（平鋪，依修改時間排序） -->
+    <div class="w-60 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+      <div class="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider sticky top-0 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <span>Log files on Production</span>
+        <span class="text-gray-300">Newest first</span>
+      </div>
       <div v-loading="filesLoading">
-        <div v-for="ch in channels" :key="ch" class="mb-1">
-          <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider sticky top-0 bg-gray-50 dark:bg-gray-900">
-            {{ ch }}
-          </div>
-          <div
-            v-for="f in grouped[ch]" :key="f.name"
-            @click="selectFile(f.name)"
-            class="px-3 py-2 cursor-pointer text-sm flex justify-between items-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-            :class="selectedFile === f.name ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 font-medium' : 'text-gray-600 dark:text-gray-300'"
-          >
-            <span class="truncate">{{ f.date ?? f.name }}</span>
-            <span class="text-xs text-gray-400 ml-1 flex-shrink-0">{{ f.size }}</span>
-          </div>
+        <div
+          v-for="f in allFiles" :key="f.name"
+          @click="selectFile(f.name)"
+          class="px-3 py-2 cursor-pointer text-sm flex justify-between items-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors border-b border-gray-100 dark:border-gray-800"
+          :class="selectedFile === f.name ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 font-medium' : 'text-gray-600 dark:text-gray-300'"
+        >
+          <span class="truncate text-xs">{{ f.name }}</span>
+          <span class="text-xs text-gray-400 ml-2 flex-shrink-0">{{ f.size }}</span>
         </div>
       </div>
     </div>
@@ -96,11 +94,10 @@ onMounted(async () => {
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- 搜尋列 -->
       <div class="flex items-center gap-3 p-3 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-        <span class="text-sm font-medium text-gray-500 flex-shrink-0">{{ selectedFile }}</span>
         <el-select v-model="filter.severity" placeholder="全部等級" clearable class="w-32!" @change="onSearch">
           <el-option v-for="s in ['INFO','WARNING','ERROR','CRITICAL','DEBUG','NOTICE']" :key="s" :label="s" :value="s" />
         </el-select>
-        <el-input v-model="filter.search" placeholder="搜尋訊息..." clearable class="flex-1 max-w-xs!" @keyup.enter="onSearch" />
+        <el-input v-model="filter.search" placeholder="搜尋訊息..." clearable class="flex-1 max-w-sm!" @keyup.enter="onSearch" />
         <el-button type="primary" @click="onSearch">搜尋</el-button>
         <span class="text-xs text-gray-400 ml-auto flex-shrink-0">共 {{ pagination.total }} 筆</span>
       </div>
