@@ -48,12 +48,13 @@ async function doQuery() {
       quote.value   = res.data.quote;
       history.value = res.data.history ?? [];
       ticker.value  = res.data.ticker  ?? `${c}.TW`;
-      await nextTick();
-      renderChart();
     }
   } finally {
-    quoteLoading.value = false;
+    quoteLoading.value = false; // 先關 loading，讓 v-if 渲染出 chartRef DOM
   }
+  // 等 DOM 渲染完（v-if 變 true）才初始化 ECharts
+  await nextTick();
+  renderChart();
 
   // ── 2. 其他區塊並行懶加載（不擋 UI）────────────────────────
   institLoading.value = true;
@@ -268,16 +269,16 @@ function cc(val: number | null) {
             </el-table-column>
             <el-table-column label="月增" align="right" width="90">
               <template #default="{ row }">
-                <span v-if="row.momPct" :class="String(row.momPct).startsWith('-') ? 'text-green-500' : 'text-red-500'">
-                  {{ String(row.momPct).startsWith('-') ? '▼' : '▲' }}{{ row.momPct }}
+                <span v-if="row.momPct != null" :class="parseFloat(row.momPct) < 0 ? 'text-green-500' : 'text-red-500'">
+                  {{ parseFloat(row.momPct) < 0 ? '▼' : '▲' }}{{ Math.abs(parseFloat(row.momPct)).toFixed(1) }}%
                 </span>
                 <span v-else class="text-gray-400">-</span>
               </template>
             </el-table-column>
             <el-table-column label="年增" align="right" width="90">
               <template #default="{ row }">
-                <span v-if="row.yoyPct" :class="String(row.yoyPct).startsWith('-') ? 'text-green-500' : 'text-red-500'">
-                  {{ String(row.yoyPct).startsWith('-') ? '▼' : '▲' }}{{ row.yoyPct }}
+                <span v-if="row.yoyPct != null" :class="parseFloat(row.yoyPct) < 0 ? 'text-green-500' : 'text-red-500'">
+                  {{ parseFloat(row.yoyPct) < 0 ? '▼' : '▲' }}{{ Math.abs(parseFloat(row.yoyPct)).toFixed(1) }}%
                 </span>
                 <span v-else class="text-gray-400">-</span>
               </template>
