@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { getHoldingList, getAllBots } from "@/api/tg";
 
 defineOptions({ name: "TgHolding" });
 
+const route  = useRoute();
 const router = useRouter();
+// 從股票區進來時，明細也留在股票區；從 TG Bot 進來則留在 TG Bot 區
+const detailBase = route.path.startsWith("/stock") ? "/stock/holding" : "/tg/holding";
 const loading = ref(false);
 const dataList = ref([]);
 const botOptions = ref([]);
@@ -98,7 +101,7 @@ onMounted(async () => {
             type="primary"
             @click="
               router.push({
-                path: `/tg/holding/${row.tgChatId}`,
+                path: `${detailBase}/${row.tgChatId}`,
                 query: searchForm.bot_id ? { bot_id: searchForm.bot_id } : {}
               })
             "

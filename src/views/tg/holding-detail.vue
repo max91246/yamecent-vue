@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getUserDetail } from "@/api/tg";
 
 defineOptions({ name: "TgHoldingDetail" });
 
-const route = useRoute();
-const router = useRouter();
+const route      = useRoute();
+const router     = useRouter();
+const backPath   = computed(() =>
+  route.path.startsWith("/stock") ? "/stock/holding" : "/tg/holding"
+);
 const loading = ref(false);
 const detail = ref<any>(null);
 
@@ -26,7 +29,7 @@ onMounted(fetchDetail);
 <template>
   <div v-loading="loading" class="p-4">
     <div class="flex items-center gap-3 mb-5">
-      <el-button :icon="'ArrowLeft'" circle @click="router.back()" />
+      <el-button :icon="'ArrowLeft'" circle @click="router.push(backPath)" />
       <span class="text-lg font-medium"
         >Chat ID：{{ route.params.chatId }}</span
       >
