@@ -220,7 +220,7 @@ function cc(val: number | null) {
             </template>
           </el-table-column>
           <el-table-column label="成交量（張）" min-width="120" align="right">
-            <template #default="{ row }">{{ Math.round(row.volume / 1000).toLocaleString() }}</template>
+            <template #default="{ row }">{{ row.volume?.toLocaleString() }}</template>
           </el-table-column>
         </el-table>
       </div>
@@ -295,23 +295,21 @@ function cc(val: number | null) {
         <div v-if="distLoading" class="p-4"><el-skeleton :rows="6" animated /></div>
         <div v-else-if="!dist.length" class="py-6 text-center text-gray-400 text-sm">無資料</div>
         <el-table v-else :data="dist" size="small" stripe border>
-          <el-table-column prop="date"          label="資料日期"     width="110" />
-          <el-table-column prop="totalHolders"  label="總股東人數"   width="110" align="right">
-            <template #default="{ row }">{{ row.totalHolders?.toLocaleString() }}</template>
+          <el-table-column prop="date"           label="資料日期"     width="110" />
+          <el-table-column prop="total_holders"  label="總股東人數"   width="110" align="right">
+            <template #default="{ row }">{{ Number(row.total_holders).toLocaleString() }}</template>
           </el-table-column>
-          <el-table-column prop="avgShares"     label="平均張數/人"  width="110" align="right" />
-          <el-table-column prop="over400count"  label=">400張人數"   width="100" align="right" />
-          <el-table-column prop="over400pct"    label=">400張持有%"  width="110" align="right">
-            <template #default="{ row }">{{ row.over400pct?.toFixed(2) }}%</template>
+          <el-table-column prop="avg_lots"       label="平均張數/人"  width="110" align="right" />
+          <el-table-column prop="over400_count"  label=">400張人數"   width="100" align="right" />
+          <el-table-column prop="over400_pct"    label=">400張持有%"  width="110" align="right" />
+          <el-table-column prop="range_400_600"  label="400~600張"    width="90"  align="right" />
+          <el-table-column prop="range_600_800"  label="600~800張"    width="90"  align="right" />
+          <el-table-column prop="range_800_1000" label="800~1000張"   width="100" align="right" />
+          <el-table-column prop="over1000_count" label=">1000張人數"  width="110" align="right" />
+          <el-table-column prop="over1000_pct"   label=">1000張持有%" width="120" align="right">
+            <template #default="{ row }"><b class="text-red-500">{{ row.over1000_pct }}</b></template>
           </el-table-column>
-          <el-table-column prop="b400to600"     label="400~600張"    width="90"  align="right" />
-          <el-table-column prop="b600to800"     label="600~800張"    width="90"  align="right" />
-          <el-table-column prop="b800to1000"    label="800~1000張"   width="100" align="right" />
-          <el-table-column prop="over1000count" label=">1000張人數"  width="110" align="right" />
-          <el-table-column prop="over1000pct"   label=">1000張持有%" width="120" align="right">
-            <template #default="{ row }"><b class="text-red-500">{{ row.over1000pct?.toFixed(2) }}%</b></template>
-          </el-table-column>
-          <el-table-column prop="closePrice"    label="收盤價"       width="90"  align="right" />
+          <el-table-column prop="close_price"    label="收盤價"       width="90"  align="right" />
         </el-table>
       </div>
 
