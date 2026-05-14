@@ -1,1 +1,0 @@
-import{Ho as e}from"./index-DZsD1k2f.js";var t=`/api/admin/av`,n=()=>e.request(`get`,`${t}/popular-tags`),r=n=>e.request(`post`,`${t}/videos`,{data:n}),i=n=>e.request(`delete`,`${t}/videos/${n}`),a=n=>e.request(`post`,`${t}/actresses`,{data:n}),o=n=>e.request(`delete`,`${t}/actresses/${n}`);export{r as a,n as i,i as n,a as r,o as t};
