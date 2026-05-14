@@ -70,6 +70,47 @@ pnpm build
 
 > **注意：** 本專案使用 production build 模式，修改後執行 `pnpm build` 即可，nginx 自動 serve 新的 `dist/`。
 
+## 部署流程（CI/CD）
+
+升級由開發者在本地 build + push 後，**手動前往 GitHub Actions 觸發**，不自動部署。
+
+### 開發者工作流
+
+```bash
+# 1. 修改代碼
+# 2. 打包
+pnpm build
+
+# 3. 推上 GitHub
+git add -A
+git commit -m "feat: ..."
+git push origin master
+```
+
+```text
+4. 前往 GitHub Actions 手動觸發
+   https://github.com/max91246/yamecent-vue/actions
+   → Deploy Vue → Run workflow → master → Run workflow
+
+5. 等候 Telegram 通知確認結果
+```
+
+### GitHub Actions 部署步驟（自動執行）
+
+```bash
+# GCP 上執行
+cd /home/max91246/www/yamecent-vue-repo
+git fetch origin master
+git reset --hard origin/master
+# nginx 自動 serve 新的 dist/ 無需 reload
+```
+
+### 說明
+
+- `yamecent-vue-repo` — GCP 上 nginx serve 的目錄，包含 build 後的 `dist/`
+- `yamecent-vue` — 本 repo，包含源碼 + `dist/`（一起 commit）
+- push 的 `dist/` 就是線上版本，GCP git reset 後立即生效
+
 ## 相關專案
 
 - [yamecent-admin](https://github.com/max91246/yamecent-admin) — Laravel 後端 API
