@@ -44,12 +44,26 @@
 
       <!-- 卡牌表格 -->
       <el-table :data="list" v-loading="loading" border stripe>
+        <el-table-column label="圖片" width="90" align="center">
+          <template #default="{ row }">
+            <el-image
+              v-if="row.image_url"
+              :src="row.image_url"
+              :preview-src-list="[row.image_url]"
+              fit="contain"
+              style="width:70px;height:50px;cursor:pointer"
+              preview-teleported
+              lazy
+            />
+            <span v-else class="text-gray-300 text-xs">無圖</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="series" label="彈數" width="100" align="center">
           <template #default="{ row }">
             <el-tag size="small" :type="seriesTagType(row.series)">{{ row.series }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="名稱" width="110" align="center">
+        <el-table-column prop="name" label="名稱" width="150" align="center">
           <template #default="{ row }">
             <span class="font-bold">{{ row.name }}</span>
           </template>
@@ -77,9 +91,31 @@
             >{{ w }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="星級" width="130" align="center">
+        <el-table-column label="星級" width="110" align="center">
           <template #default="{ row }">
             <span class="text-yellow-500">{{ '⭐'.repeat(row.grade) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="極巨化" width="80" align="center">
+          <template #default="{ row }">
+            <el-switch
+              v-model="row.is_gigantamax"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="#dc2626"
+              @change="toggleGigantamaxFn(row)"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="超級進化" width="90" align="center">
+          <template #default="{ row }">
+            <el-switch
+              v-model="row.is_mega"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="#16a34a"
+              @change="toggleMegaFn(row)"
+            />
           </template>
         </el-table-column>
       </el-table>
@@ -125,7 +161,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { getMezastarSeries, getMezastarTypes, getMezastarCards } from "@/api/mezastar";
+import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega } from "@/api/mezastar";
+import { ElMessage } from "element-plus";
 
 const loading    = ref(false);
 const list       = ref([]);
@@ -199,6 +236,26 @@ function resetFilters() {
   filters.value = { series: "", type: "", weakness: "", name: "" };
   page.value    = 1;
   fetchCards();
+}
+
+async function toggleGigantamaxFn(row: any) {
+  try {
+    await toggleGigantamax(row.id, row.is_gigantamax);
+    ElMessage.success(row.is_gigantamax ? `${row.name} 已標記為極巨化` : `${row.name} 已取消極巨化`);
+  } catch {
+    ElMessage.error("更新失敗");
+    row.is_gigantamax = row.is_gigantamax ? 0 : 1;
+  }
+}
+
+async function toggleMegaFn(row: any) {
+  try {
+    await toggleMega(row.id, row.is_mega);
+    ElMessage.success(row.is_mega ? `${row.name} 已標記為超級進化` : `${row.name} 已取消超級進化`);
+  } catch {
+    ElMessage.error("更新失敗");
+    row.is_mega = row.is_mega ? 0 : 1;
+  }
 }
 
 function quickFilterSeries(s: string) {

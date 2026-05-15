@@ -128,6 +128,13 @@ onMounted(fetchList);
     <el-table v-loading="loading" :data="dataList" border stripe>
       <el-table-column prop="id" label="ID" width="60" />
       <el-table-column prop="name" label="名稱" width="160" />
+      <el-table-column label="類型" width="130" align="center">
+        <template #default="{ row }">
+          <el-tag size="small" :type="row.type === 1 ? 'primary' : row.type === 2 ? 'warning' : 'success'">
+            {{ row.type === 1 ? '股票機器人' : row.type === 2 ? 'AV 機器人' : 'Mezastar' }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="token"
         label="Token"
@@ -188,6 +195,13 @@ onMounted(fetchList);
         <el-form-item label="Token" required
           ><el-input v-model="form.token"
         /></el-form-item>
+        <el-form-item label="類型" required>
+          <el-select v-model="form.type" style="width:200px">
+            <el-option :value="1" label="1 - 股票機器人" />
+            <el-option :value="2" label="2 - AV 機器人" />
+            <el-option :value="3" label="3 - Mezastar 寶可夢" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="狀態">
           <el-switch
             v-model="form.is_active"

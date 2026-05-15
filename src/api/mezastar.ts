@@ -8,3 +8,9 @@ export const getMezastarTypes = () =>
 
 export const getMezastarCards = (params: object) =>
   http.post("/api/admin/mezastar/cards", { data: params });
+
+export const toggleGigantamax = (id: number, is_gigantamax: number) =>
+  http.request("put", `/api/admin/mezastar/cards/${id}/gigantamax`, { data: { is_gigantamax } });
+
+export const toggleMega = (id: number, is_mega: number) =>
+  http.request("put", `/api/admin/mezastar/cards/${id}/mega`, { data: { is_mega } });
