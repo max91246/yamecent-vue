@@ -25,6 +25,28 @@
         <el-form-item label="名稱">
           <el-input v-model="filters.name" clearable placeholder="搜尋名稱" style="width:130px" />
         </el-form-item>
+        <el-form-item label="星級">
+          <el-select v-model="filters.grade" clearable placeholder="全部" style="width:100px">
+            <el-option label="★6" :value="6" />
+            <el-option label="★5" :value="5" />
+            <el-option label="★4" :value="4" />
+            <el-option label="★3" :value="3" />
+            <el-option label="★2" :value="2" />
+            <el-option label="★1" :value="1" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="極巨化">
+          <el-select v-model="filters.is_gigantamax" clearable placeholder="全部" style="width:100px">
+            <el-option label="是" :value="1" />
+            <el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="超級進化">
+          <el-select v-model="filters.is_mega" clearable placeholder="全部" style="width:100px">
+            <el-option label="是" :value="1" />
+            <el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="fetchCards">查詢</el-button>
           <el-button @click="resetFilters">重置</el-button>
@@ -172,7 +194,7 @@ const pageSize   = ref(50);
 const seriesList = ref<string[]>([]);
 const typeList   = ref<string[]>([]);
 
-const filters = ref({ series: "", type: "", weakness: "", name: "" });
+const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_gigantamax: "" as any, is_mega: "" as any });
 
 const TYPE_COLORS: Record<string, string> = {
   一般: "#A8A878", 火: "#F08030", 水: "#6890F0", 電: "#F8D030",
@@ -233,7 +255,7 @@ async function fetchCards() {
 }
 
 function resetFilters() {
-  filters.value = { series: "", type: "", weakness: "", name: "" };
+  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_gigantamax: "", is_mega: "" };
   page.value    = 1;
   fetchCards();
 }
