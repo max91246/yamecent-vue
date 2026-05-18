@@ -167,6 +167,19 @@
               active-color="#d97706" @change="toggleZMoveFn(row)" />
           </template>
         </el-table-column>
+        <el-table-column label="能力值" width="200" align="center">
+          <template #default="{ row }">
+            <div v-if="row.hp != null" class="text-xs leading-tight text-left">
+              <span class="inline-block w-10 text-gray-400">HP</span><span class="font-mono">{{ row.hp }}</span><br/>
+              <span class="inline-block w-10 text-gray-400">攻擊</span><span class="font-mono">{{ row.attack }}</span>
+              <span class="ml-2 text-gray-400">防禦</span><span class="font-mono ml-1">{{ row.defense }}</span><br/>
+              <span class="inline-block w-10 text-gray-400">特攻</span><span class="font-mono">{{ row.sp_attack }}</span>
+              <span class="ml-2 text-gray-400">特防</span><span class="font-mono ml-1">{{ row.sp_defense }}</span><br/>
+              <span class="inline-block w-10 text-gray-400">速度</span><span class="font-mono">{{ row.speed }}</span>
+            </div>
+            <span v-else class="text-gray-300 text-xs">未填</span>
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 分頁 -->
