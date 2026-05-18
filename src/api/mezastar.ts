@@ -20,3 +20,6 @@ export const toggleUltraGigantamax = (id: number, is_ultra_gigantamax: number) =
 
 export const toggleDualMove = (id: number, is_dual_move: number) =>
   http.request("put", `/api/admin/mezastar/cards/${id}/dual-move`, { data: { is_dual_move } });
+
+export const toggleZMove = (id: number, is_z_move: number) =>
+  http.request("put", `/api/admin/mezastar/cards/${id}/z-move`, { data: { is_z_move } });

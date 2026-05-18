@@ -61,6 +61,11 @@
             <el-option label="是" :value="1" /><el-option label="否" :value="0" />
           </el-select>
         </el-form-item>
+        <el-form-item label="Z招式">
+          <el-select v-model="filters.is_z_move" clearable placeholder="全部" style="width:90px">
+            <el-option label="是" :value="1" /><el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="fetchCards">查詢</el-button>
           <el-button @click="resetFilters">重置</el-button>
@@ -156,6 +161,12 @@
               active-color="#0284c7" @change="toggleDualMoveFn(row)" />
           </template>
         </el-table-column>
+        <el-table-column label="Z招式" width="72" align="center">
+          <template #default="{ row }">
+            <el-switch v-model="row.is_z_move" :active-value="1" :inactive-value="0"
+              active-color="#d97706" @change="toggleZMoveFn(row)" />
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 分頁 -->
@@ -199,7 +210,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove } from "@/api/mezastar";
+import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove, toggleZMove } from "@/api/mezastar";
 import { ElMessage } from "element-plus";
 
 const loading    = ref(false);
@@ -210,7 +221,7 @@ const pageSize   = ref(50);
 const seriesList = ref<string[]>([]);
 const typeList   = ref<string[]>([]);
 
-const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_mega: "" as any, is_gigantamax: "" as any, is_ultra_gigantamax: "" as any, is_dual_move: "" as any });
+const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_mega: "" as any, is_gigantamax: "" as any, is_ultra_gigantamax: "" as any, is_dual_move: "" as any, is_z_move: "" as any });
 
 const TYPE_COLORS: Record<string, string> = {
   一般: "#A8A878", 火: "#F08030", 水: "#6890F0", 電: "#F8D030",
@@ -271,7 +282,7 @@ async function fetchCards() {
 }
 
 function resetFilters() {
-  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_mega: "", is_gigantamax: "", is_ultra_gigantamax: "", is_dual_move: "" };
+  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_mega: "", is_gigantamax: "", is_ultra_gigantamax: "", is_dual_move: "", is_z_move: "" };
   page.value    = 1;
   fetchCards();
 }
@@ -305,6 +316,13 @@ async function toggleDualMoveFn(row: any) {
     await toggleDualMove(row.id, row.is_dual_move);
     ElMessage.success(row.is_dual_move ? `${row.name} 已標記為雙重招式` : `${row.name} 已取消雙重招式`);
   } catch { ElMessage.error("更新失敗"); row.is_dual_move = row.is_dual_move ? 0 : 1; }
+}
+
+async function toggleZMoveFn(row: any) {
+  try {
+    await toggleZMove(row.id, row.is_z_move);
+    ElMessage.success(row.is_z_move ? `${row.name} 已標記為Z招式` : `${row.name} 已取消Z招式`);
+  } catch { ElMessage.error("更新失敗"); row.is_z_move = row.is_z_move ? 0 : 1; }
 }
 
 function quickFilterSeries(s: string) {
