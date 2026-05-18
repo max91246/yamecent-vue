@@ -14,3 +14,9 @@ export const toggleGigantamax = (id: number, is_gigantamax: number) =>
 
 export const toggleMega = (id: number, is_mega: number) =>
   http.request("put", `/api/admin/mezastar/cards/${id}/mega`, { data: { is_mega } });
+
+export const toggleUltraGigantamax = (id: number, is_ultra_gigantamax: number) =>
+  http.request("put", `/api/admin/mezastar/cards/${id}/ultra-gigantamax`, { data: { is_ultra_gigantamax } });
+
+export const toggleDualMove = (id: number, is_dual_move: number) =>
+  http.request("put", `/api/admin/mezastar/cards/${id}/dual-move`, { data: { is_dual_move } });

@@ -42,9 +42,23 @@
           </el-select>
         </el-form-item>
         <el-form-item label="超級進化">
-          <el-select v-model="filters.is_mega" clearable placeholder="全部" style="width:100px">
-            <el-option label="是" :value="1" />
-            <el-option label="否" :value="0" />
+          <el-select v-model="filters.is_mega" clearable placeholder="全部" style="width:90px">
+            <el-option label="是" :value="1" /><el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="極巨化">
+          <el-select v-model="filters.is_gigantamax" clearable placeholder="全部" style="width:90px">
+            <el-option label="是" :value="1" /><el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="超極巨化">
+          <el-select v-model="filters.is_ultra_gigantamax" clearable placeholder="全部" style="width:90px">
+            <el-option label="是" :value="1" /><el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="雙重招式">
+          <el-select v-model="filters.is_dual_move" clearable placeholder="全部" style="width:90px">
+            <el-option label="是" :value="1" /><el-option label="否" :value="0" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -118,26 +132,28 @@
             <span class="text-yellow-500">{{ '⭐'.repeat(row.grade) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="極巨化" width="80" align="center">
+        <el-table-column label="超級進化" width="80" align="center">
           <template #default="{ row }">
-            <el-switch
-              v-model="row.is_gigantamax"
-              :active-value="1"
-              :inactive-value="0"
-              active-color="#dc2626"
-              @change="toggleGigantamaxFn(row)"
-            />
+            <el-switch v-model="row.is_mega" :active-value="1" :inactive-value="0"
+              active-color="#16a34a" @change="toggleMegaFn(row)" />
           </template>
         </el-table-column>
-        <el-table-column label="超級進化" width="90" align="center">
+        <el-table-column label="極巨化" width="75" align="center">
           <template #default="{ row }">
-            <el-switch
-              v-model="row.is_mega"
-              :active-value="1"
-              :inactive-value="0"
-              active-color="#16a34a"
-              @change="toggleMegaFn(row)"
-            />
+            <el-switch v-model="row.is_gigantamax" :active-value="1" :inactive-value="0"
+              active-color="#dc2626" @change="toggleGigantamaxFn(row)" />
+          </template>
+        </el-table-column>
+        <el-table-column label="超極巨化" width="82" align="center">
+          <template #default="{ row }">
+            <el-switch v-model="row.is_ultra_gigantamax" :active-value="1" :inactive-value="0"
+              active-color="#7c3aed" @change="toggleUltraGigantamaxFn(row)" />
+          </template>
+        </el-table-column>
+        <el-table-column label="雙重招式" width="82" align="center">
+          <template #default="{ row }">
+            <el-switch v-model="row.is_dual_move" :active-value="1" :inactive-value="0"
+              active-color="#0284c7" @change="toggleDualMoveFn(row)" />
           </template>
         </el-table-column>
       </el-table>
@@ -183,7 +199,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega } from "@/api/mezastar";
+import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove } from "@/api/mezastar";
 import { ElMessage } from "element-plus";
 
 const loading    = ref(false);
@@ -194,7 +210,7 @@ const pageSize   = ref(50);
 const seriesList = ref<string[]>([]);
 const typeList   = ref<string[]>([]);
 
-const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_gigantamax: "" as any, is_mega: "" as any });
+const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_mega: "" as any, is_gigantamax: "" as any, is_ultra_gigantamax: "" as any, is_dual_move: "" as any });
 
 const TYPE_COLORS: Record<string, string> = {
   一般: "#A8A878", 火: "#F08030", 水: "#6890F0", 電: "#F8D030",
@@ -255,7 +271,7 @@ async function fetchCards() {
 }
 
 function resetFilters() {
-  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_gigantamax: "", is_mega: "" };
+  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_mega: "", is_gigantamax: "", is_ultra_gigantamax: "", is_dual_move: "" };
   page.value    = 1;
   fetchCards();
 }
@@ -274,10 +290,21 @@ async function toggleMegaFn(row: any) {
   try {
     await toggleMega(row.id, row.is_mega);
     ElMessage.success(row.is_mega ? `${row.name} 已標記為超級進化` : `${row.name} 已取消超級進化`);
-  } catch {
-    ElMessage.error("更新失敗");
-    row.is_mega = row.is_mega ? 0 : 1;
-  }
+  } catch { ElMessage.error("更新失敗"); row.is_mega = row.is_mega ? 0 : 1; }
+}
+
+async function toggleUltraGigantamaxFn(row: any) {
+  try {
+    await toggleUltraGigantamax(row.id, row.is_ultra_gigantamax);
+    ElMessage.success(row.is_ultra_gigantamax ? `${row.name} 已標記為超極巨化` : `${row.name} 已取消超極巨化`);
+  } catch { ElMessage.error("更新失敗"); row.is_ultra_gigantamax = row.is_ultra_gigantamax ? 0 : 1; }
+}
+
+async function toggleDualMoveFn(row: any) {
+  try {
+    await toggleDualMove(row.id, row.is_dual_move);
+    ElMessage.success(row.is_dual_move ? `${row.name} 已標記為雙重招式` : `${row.name} 已取消雙重招式`);
+  } catch { ElMessage.error("更新失敗"); row.is_dual_move = row.is_dual_move ? 0 : 1; }
 }
 
 function quickFilterSeries(s: string) {
