@@ -186,6 +186,11 @@
             <span v-else class="text-gray-300 text-xs">未填</span>
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="70" align="center" fixed="right">
+          <template #default="{ row }">
+            <el-button type="primary" size="small" link @click="openEdit(row)">編輯</el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 分頁 -->
@@ -200,6 +205,67 @@
         />
       </div>
     </el-card>
+
+    <!-- 編輯 Dialog -->
+    <el-dialog v-model="editVisible" title="編輯寶可夢資料" width="600px" destroy-on-close>
+      <el-form v-if="editForm" :model="editForm" label-width="90px" label-position="left">
+        <el-divider content-position="left">基本資訊</el-divider>
+        <el-form-item label="彈數">
+          <el-select v-model="editForm.series" style="width:100%">
+            <el-option v-for="s in seriesList" :key="s" :label="s" :value="s" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="屬性1">
+          <el-select v-model="editForm.type1" style="width:100%">
+            <el-option v-for="t in typeList" :key="t" :label="t" :value="t" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="屬性2">
+          <el-select v-model="editForm.type2" clearable placeholder="無" style="width:100%">
+            <el-option v-for="t in typeList" :key="t" :label="t" :value="t" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="招式屬性">
+          <el-select v-model="editForm.move_type" style="width:100%">
+            <el-option v-for="t in typeList" :key="t" :label="t" :value="t" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="星級">
+          <el-select v-model="editForm.grade" style="width:100%">
+            <el-option v-for="g in [1,2,3,4,5,6]" :key="g" :label="`★${g}`" :value="g" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="弱點">
+          <el-select v-model="editForm.weakness" multiple style="width:100%">
+            <el-option v-for="t in typeList" :key="t" :label="t" :value="t" />
+          </el-select>
+        </el-form-item>
+
+        <el-divider content-position="left">特殊標記</el-divider>
+        <el-row :gutter="16">
+          <el-col :span="8"><el-form-item label="超級進化"><el-switch v-model="editForm.is_mega" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
+          <el-col :span="8"><el-form-item label="極巨化"><el-switch v-model="editForm.is_gigantamax" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
+          <el-col :span="8"><el-form-item label="超極巨化"><el-switch v-model="editForm.is_ultra_gigantamax" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
+          <el-col :span="8"><el-form-item label="雙重招式"><el-switch v-model="editForm.is_dual_move" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
+          <el-col :span="8"><el-form-item label="Z招式"><el-switch v-model="editForm.is_z_move" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
+        </el-row>
+
+        <el-divider content-position="left">能力值</el-divider>
+        <el-row :gutter="16">
+          <el-col :span="12"><el-form-item label="寶可能量"><el-input-number v-model="editForm.power" :min="0" :max="999" controls-position="right" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="HP"><el-input-number v-model="editForm.hp" :min="0" :max="999" controls-position="right" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="攻擊"><el-input-number v-model="editForm.attack" :min="0" :max="999" controls-position="right" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="防禦"><el-input-number v-model="editForm.defense" :min="0" :max="999" controls-position="right" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="特攻"><el-input-number v-model="editForm.sp_attack" :min="0" :max="999" controls-position="right" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="特防"><el-input-number v-model="editForm.sp_defense" :min="0" :max="999" controls-position="right" style="width:100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="速度"><el-input-number v-model="editForm.speed" :min="0" :max="999" controls-position="right" style="width:100%" /></el-form-item></el-col>
+        </el-row>
+      </el-form>
+      <template #footer>
+        <el-button @click="editVisible = false">取消</el-button>
+        <el-button type="primary" :loading="saving" @click="saveEdit">儲存</el-button>
+      </template>
+    </el-dialog>
 
     <!-- 屬性剋制說明 -->
     <el-card class="mt-4">
@@ -229,7 +295,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove, toggleZMove } from "@/api/mezastar";
+import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove, toggleZMove, updateCard } from "@/api/mezastar";
 import { ElMessage } from "element-plus";
 
 const loading    = ref(false);
@@ -239,6 +305,10 @@ const page       = ref(1);
 const pageSize   = ref(50);
 const seriesList = ref<string[]>([]);
 const typeList   = ref<string[]>([]);
+
+const editVisible = ref(false);
+const editForm    = ref<any>(null);
+const saving      = ref(false);
 
 const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_mega: "" as any, is_gigantamax: "" as any, is_ultra_gigantamax: "" as any, is_dual_move: "" as any, is_z_move: "" as any });
 
@@ -342,6 +412,51 @@ async function toggleZMoveFn(row: any) {
     await toggleZMove(row.id, row.is_z_move);
     ElMessage.success(row.is_z_move ? `${row.name} 已標記為Z招式` : `${row.name} 已取消Z招式`);
   } catch { ElMessage.error("更新失敗"); row.is_z_move = row.is_z_move ? 0 : 1; }
+}
+
+function openEdit(row: any) {
+  editForm.value = {
+    id: row.id,
+    series: row.series,
+    type1: row.type1,
+    type2: row.type2 ?? null,
+    move_type: row.move_type,
+    grade: row.grade,
+    weakness: Array.isArray(row.weakness) ? [...row.weakness] : [],
+    is_mega: row.is_mega,
+    is_gigantamax: row.is_gigantamax,
+    is_ultra_gigantamax: row.is_ultra_gigantamax,
+    is_dual_move: row.is_dual_move,
+    is_z_move: row.is_z_move,
+    power: row.power ?? null,
+    hp: row.hp ?? null,
+    attack: row.attack ?? null,
+    defense: row.defense ?? null,
+    sp_attack: row.sp_attack ?? null,
+    sp_defense: row.sp_defense ?? null,
+    speed: row.speed ?? null,
+  };
+  editVisible.value = true;
+}
+
+async function saveEdit() {
+  if (!editForm.value) return;
+  saving.value = true;
+  try {
+    const { id, ...data } = editForm.value;
+    const res: any = await updateCard(id, data);
+    if (res.success) {
+      ElMessage.success("儲存成功");
+      editVisible.value = false;
+      fetchCards();
+    } else {
+      ElMessage.error("儲存失敗");
+    }
+  } catch {
+    ElMessage.error("儲存失敗");
+  } finally {
+    saving.value = false;
+  }
 }
 
 function quickFilterSeries(s: string) {
