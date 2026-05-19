@@ -66,6 +66,11 @@
             <el-option label="是" :value="1" /><el-option label="否" :value="0" />
           </el-select>
         </el-form-item>
+        <el-form-item label="幻">
+          <el-select v-model="filters.is_mythical" clearable placeholder="全部" style="width:90px">
+            <el-option label="是" :value="1" /><el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="fetchCards">查詢</el-button>
           <el-button @click="resetFilters">重置</el-button>
@@ -167,6 +172,12 @@
               active-color="#d97706" @change="toggleZMoveFn(row)" />
           </template>
         </el-table-column>
+        <el-table-column label="幻" width="60" align="center">
+          <template #default="{ row }">
+            <el-switch v-model="row.is_mythical" :active-value="1" :inactive-value="0"
+              active-color="#ec4899" @change="toggleMythicalFn(row)" />
+          </template>
+        </el-table-column>
         <el-table-column label="寶可能量" width="80" align="center">
           <template #default="{ row }">
             <span v-if="row.power != null" class="font-bold text-red-500 text-base">{{ row.power }}</span>
@@ -248,6 +259,7 @@
           <el-col :span="8"><el-form-item label="超極巨化"><el-switch v-model="editForm.is_ultra_gigantamax" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
           <el-col :span="8"><el-form-item label="雙重招式"><el-switch v-model="editForm.is_dual_move" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
           <el-col :span="8"><el-form-item label="Z招式"><el-switch v-model="editForm.is_z_move" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
+          <el-col :span="8"><el-form-item label="幻之寶可夢"><el-switch v-model="editForm.is_mythical" :active-value="1" :inactive-value="0" active-color="#ec4899" /></el-form-item></el-col>
         </el-row>
 
         <el-divider content-position="left">能力值</el-divider>
@@ -295,7 +307,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove, toggleZMove, updateCard } from "@/api/mezastar";
+import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove, toggleZMove, toggleMythical, updateCard } from "@/api/mezastar";
 import { ElMessage } from "element-plus";
 
 const loading    = ref(false);
@@ -310,7 +322,7 @@ const editVisible = ref(false);
 const editForm    = ref<any>(null);
 const saving      = ref(false);
 
-const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_mega: "" as any, is_gigantamax: "" as any, is_ultra_gigantamax: "" as any, is_dual_move: "" as any, is_z_move: "" as any });
+const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_mega: "" as any, is_gigantamax: "" as any, is_ultra_gigantamax: "" as any, is_dual_move: "" as any, is_z_move: "" as any, is_mythical: "" as any });
 
 const TYPE_COLORS: Record<string, string> = {
   一般: "#A8A878", 火: "#F08030", 水: "#6890F0", 電: "#F8D030",
@@ -371,7 +383,7 @@ async function fetchCards() {
 }
 
 function resetFilters() {
-  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_mega: "", is_gigantamax: "", is_ultra_gigantamax: "", is_dual_move: "", is_z_move: "" };
+  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_mega: "", is_gigantamax: "", is_ultra_gigantamax: "", is_dual_move: "", is_z_move: "", is_mythical: "" };
   page.value    = 1;
   fetchCards();
 }
@@ -414,6 +426,13 @@ async function toggleZMoveFn(row: any) {
   } catch { ElMessage.error("更新失敗"); row.is_z_move = row.is_z_move ? 0 : 1; }
 }
 
+async function toggleMythicalFn(row: any) {
+  try {
+    await toggleMythical(row.id, row.is_mythical);
+    ElMessage.success(row.is_mythical ? `${row.name} 已標記為幻之寶可夢` : `${row.name} 已取消幻之寶可夢`);
+  } catch { ElMessage.error("更新失敗"); row.is_mythical = row.is_mythical ? 0 : 1; }
+}
+
 function openEdit(row: any) {
   editForm.value = {
     id: row.id,
@@ -428,6 +447,7 @@ function openEdit(row: any) {
     is_ultra_gigantamax: row.is_ultra_gigantamax,
     is_dual_move: row.is_dual_move,
     is_z_move: row.is_z_move,
+    is_mythical: row.is_mythical,
     power: row.power ?? null,
     hp: row.hp ?? null,
     attack: row.attack ?? null,
