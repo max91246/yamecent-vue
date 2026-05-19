@@ -71,6 +71,11 @@
             <el-option label="是" :value="1" /><el-option label="否" :value="0" />
           </el-select>
         </el-form-item>
+        <el-form-item label="雙重衝擊">
+          <el-select v-model="filters.is_double_rush" clearable placeholder="全部" style="width:90px">
+            <el-option label="是" :value="1" /><el-option label="否" :value="0" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="fetchCards">查詢</el-button>
           <el-button @click="resetFilters">重置</el-button>
@@ -178,6 +183,12 @@
               active-color="#ec4899" @change="toggleMythicalFn(row)" />
           </template>
         </el-table-column>
+        <el-table-column label="雙衝" width="62" align="center">
+          <template #default="{ row }">
+            <el-switch v-model="row.is_double_rush" :active-value="1" :inactive-value="0"
+              active-color="#0891b2" @change="toggleDoubleRushFn(row)" />
+          </template>
+        </el-table-column>
         <el-table-column label="寶可能量" width="80" align="center">
           <template #default="{ row }">
             <span v-if="row.power != null" class="font-bold text-red-500 text-base">{{ row.power }}</span>
@@ -260,6 +271,7 @@
           <el-col :span="8"><el-form-item label="雙重招式"><el-switch v-model="editForm.is_dual_move" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
           <el-col :span="8"><el-form-item label="Z招式"><el-switch v-model="editForm.is_z_move" :active-value="1" :inactive-value="0" /></el-form-item></el-col>
           <el-col :span="8"><el-form-item label="幻之寶可夢"><el-switch v-model="editForm.is_mythical" :active-value="1" :inactive-value="0" active-color="#ec4899" /></el-form-item></el-col>
+          <el-col :span="8"><el-form-item label="雙重衝擊"><el-switch v-model="editForm.is_double_rush" :active-value="1" :inactive-value="0" active-color="#0891b2" /></el-form-item></el-col>
         </el-row>
 
         <el-divider content-position="left">能力值</el-divider>
@@ -307,7 +319,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove, toggleZMove, toggleMythical, updateCard } from "@/api/mezastar";
+import { getMezastarSeries, getMezastarTypes, getMezastarCards, toggleGigantamax, toggleMega, toggleUltraGigantamax, toggleDualMove, toggleZMove, toggleMythical, toggleDoubleRush, updateCard } from "@/api/mezastar";
 import { ElMessage } from "element-plus";
 
 const loading    = ref(false);
@@ -322,7 +334,7 @@ const editVisible = ref(false);
 const editForm    = ref<any>(null);
 const saving      = ref(false);
 
-const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_mega: "" as any, is_gigantamax: "" as any, is_ultra_gigantamax: "" as any, is_dual_move: "" as any, is_z_move: "" as any, is_mythical: "" as any });
+const filters = ref({ series: "", type: "", weakness: "", name: "", grade: "" as any, is_mega: "" as any, is_gigantamax: "" as any, is_ultra_gigantamax: "" as any, is_dual_move: "" as any, is_z_move: "" as any, is_mythical: "" as any, is_double_rush: "" as any });
 
 const TYPE_COLORS: Record<string, string> = {
   一般: "#A8A878", 火: "#F08030", 水: "#6890F0", 電: "#F8D030",
@@ -383,7 +395,7 @@ async function fetchCards() {
 }
 
 function resetFilters() {
-  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_mega: "", is_gigantamax: "", is_ultra_gigantamax: "", is_dual_move: "", is_z_move: "", is_mythical: "" };
+  filters.value = { series: "", type: "", weakness: "", name: "", grade: "", is_mega: "", is_gigantamax: "", is_ultra_gigantamax: "", is_dual_move: "", is_z_move: "", is_mythical: "", is_double_rush: "" };
   page.value    = 1;
   fetchCards();
 }
@@ -433,6 +445,13 @@ async function toggleMythicalFn(row: any) {
   } catch { ElMessage.error("更新失敗"); row.is_mythical = row.is_mythical ? 0 : 1; }
 }
 
+async function toggleDoubleRushFn(row: any) {
+  try {
+    await toggleDoubleRush(row.id, row.is_double_rush);
+    ElMessage.success(row.is_double_rush ? `${row.name} 已標記為雙重衝擊` : `${row.name} 已取消雙重衝擊`);
+  } catch { ElMessage.error("更新失敗"); row.is_double_rush = row.is_double_rush ? 0 : 1; }
+}
+
 function openEdit(row: any) {
   editForm.value = {
     id: row.id,
@@ -448,6 +467,7 @@ function openEdit(row: any) {
     is_dual_move: row.is_dual_move,
     is_z_move: row.is_z_move,
     is_mythical: row.is_mythical,
+    is_double_rush: row.is_double_rush,
     power: row.power ?? null,
     hp: row.hp ?? null,
     attack: row.attack ?? null,

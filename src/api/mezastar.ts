@@ -27,5 +27,8 @@ export const toggleZMove = (id: number, is_z_move: number) =>
 export const toggleMythical = (id: number, is_mythical: number) =>
   http.request("put", `/api/admin/mezastar/cards/${id}/mythical`, { data: { is_mythical } });
 
+export const toggleDoubleRush = (id: number, is_double_rush: number) =>
+  http.request("put", `/api/admin/mezastar/cards/${id}/double-rush`, { data: { is_double_rush } });
+
 export const updateCard = (id: number, data: object) =>
   http.request("put", `/api/admin/mezastar/cards/${id}`, { data });
