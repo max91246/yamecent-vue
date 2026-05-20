@@ -19,6 +19,7 @@ Yamecent 後台管理前端，基於 [pure-admin v7](https://github.com/pure-adm
 | 會員管理 | 會員 CRUD、會員資格開通/撤銷、餘額調整、餘額記錄 |
 | AV 影片 | 影片列表（搜尋/番號/女優/片商）、女優列表 |
 | TG Bot | Bot 管理 + Webhook 設定、訊息記錄、持股概覽、持股明細、交易記錄 |
+| Mezastar 寶可夢 | 卡牌列表（篩選/搜尋）、屬性編輯 Dialog、特殊標記開關（超進/極巨/幻/雙衝等） |
 | 股票工具 | 處置股列表、油價 K 線資料 |
 | 系統設定 | Key-Value 設定管理 |
 | 系統管理 | 用戶、角色、菜單（動態路由由後端控制） |
@@ -30,15 +31,16 @@ yamecent-vue/
 ├── src/
 │   ├── api/          # API 呼叫（article / member / av / tg / stock / config / dashboard）
 │   ├── router/       # 路由（靜態：home、error；動態：從後端 /get-async-routes 載入）
-│   ├── views/        # 頁面
-│   │   ├── welcome/  # 首頁 Dashboard
-│   │   ├── article/  # 文章、留言
-│   │   ├── member/   # 會員、餘額記錄
-│   │   ├── av/       # 影片、女優
-│   │   ├── tg/       # Bot、訊息、持股、交易
-│   │   ├── stock/    # 處置股、油價
-│   │   ├── config/   # 系統設定
-│   │   └── system/   # 用戶/角色/菜單管理
+│   ├── views/          # 頁面
+│   │   ├── welcome/    # 首頁 Dashboard
+│   │   ├── article/    # 文章、留言
+│   │   ├── member/     # 會員、餘額記錄
+│   │   ├── av/         # 影片、女優
+│   │   ├── tg/         # Bot、訊息、持股、交易
+│   │   ├── mezastar/   # 寶可夢卡牌資料庫 + 屬性剋制速查
+│   │   ├── stock/      # 處置股、油價
+│   │   ├── config/     # 系統設定
+│   │   └── system/     # 用戶/角色/菜單管理
 │   └── utils/
 │       └── http/     # Axios 封裝（自動轉換 Laravel success/code 格式）
 ├── mock/             # 已停用（改用真實 API）
