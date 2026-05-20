@@ -32,3 +32,9 @@ export const toggleDoubleRush = (id: number, is_double_rush: number) =>
 
 export const updateCard = (id: number, data: object) =>
   http.request("put", `/api/admin/mezastar/cards/${id}`, { data });
+
+export const getMezastarHandUsers = () =>
+  http.get("/api/admin/mezastar/hand-users");
+
+export const getMezastarHands = (params: object) =>
+  http.get("/api/admin/mezastar/hands", { params });
