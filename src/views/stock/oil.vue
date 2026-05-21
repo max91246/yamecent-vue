@@ -8,8 +8,8 @@ const loading = ref(false);
 const dataList = ref([]);
 const pagination = reactive({ total: 0, pageSize: 50, currentPage: 1 });
 const searchForm = reactive({
-  ticker: "CL",
-  timeframe: "1D",
+  ticker: "QA",
+  timeframe: "i5",
   from: "",
   to: ""
 });
@@ -37,19 +37,17 @@ onMounted(fetchList);
   <div class="p-4">
     <el-form :inline="true" :model="searchForm" class="mb-4">
       <el-form-item label="代碼">
-        <el-select v-model="searchForm.ticker" class="w-28!">
-          <el-option label="WTI (CL)" value="CL" /><el-option
-            label="Brent (BZ)"
-            value="BZ"
-          />
+        <el-select v-model="searchForm.ticker" class="w-32!">
+          <el-option label="布蘭特 (QA)" value="QA" />
+          <el-option label="黃金 (GOLD)" value="GOLD" />
+          <el-option label="VIX" value="VIX" />
+          <el-option label="台指期 (WTX)" value="WTX" />
         </el-select>
       </el-form-item>
       <el-form-item label="週期">
         <el-select v-model="searchForm.timeframe" class="w-24!">
-          <el-option label="日線" value="1D" /><el-option
-            label="週線"
-            value="1W"
-          /><el-option label="月線" value="1M" />
+          <el-option label="5分K" value="i5" />
+          <el-option label="1分K" value="i1" />
         </el-select>
       </el-form-item>
       <el-form-item label="從"
