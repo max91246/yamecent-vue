@@ -39,6 +39,12 @@ function fmtDiff(val: number | null, prefix = "") {
   return sign + prefix + val.toLocaleString();
 }
 
+const totalAmount = computed(() => {
+  const items = dataList.value.filter(r => r.diffAmount !== null);
+  if (!items.length) return null;
+  return items.reduce((sum, r) => sum + r.diffAmount, 0);
+});
+
 onMounted(fetchList);
 </script>
 
@@ -108,6 +114,12 @@ onMounted(fetchList);
       </el-table-column>
       <el-table-column prop="createdAt" label="建倉時間" width="140" />
     </el-table>
+
+    <div v-if="totalAmount !== null" class="mt-3 flex justify-end">
+      <el-tag :type="totalAmount > 0 ? 'danger' : totalAmount < 0 ? 'success' : 'info'" size="large" effect="dark">
+        本頁合計損益：{{ fmtDiff(totalAmount, "NT$") }}
+      </el-tag>
+    </div>
 
     <el-pagination
       v-model:current-page="pagination.currentPage"
