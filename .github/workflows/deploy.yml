@@ -23,7 +23,6 @@ jobs:
           ssh-keyscan -H ${{ secrets.GCP_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy
-        timeout-minutes: 8
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
             ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} \
@@ -32,10 +31,6 @@ jobs:
              cd /home/max91246/www/yamecent-vue-repo
              sudo -u max91246 git fetch origin master
              sudo -u max91246 git reset --hard origin/master
-             echo '▶ 安裝依賴...'
-             sudo -u max91246 pnpm install --frozen-lockfile
-             echo '▶ Build...'
-             sudo -u max91246 pnpm build
              echo '✅ 部署完成'"
 
       - name: Notify Telegram (Success)
