@@ -1,5 +1,6 @@
 import { http } from "@/utils/http";
 const BASE = "/api/admin/stock";
+const TG_BASE = "/api/admin/tg";
 type RT = {
   code: number;
   data?: { list: any[]; total: number; pageSize: number; currentPage: number };
@@ -19,3 +20,16 @@ export const getStockDistribution  = (code: string) => sq("distribution",  { cod
 export const getStockRevenue       = (code: string) => sq("revenue",       { code }, 30000);
 export const getStockNews          = (code: string, ticker: string) =>
   sq("news", { code, ticker }, 15000);
+
+type FuturesRT = {
+  code: number;
+  data?: {
+    list: any[];
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    currentPrice: number | null;
+  };
+};
+export const getFuturesPositions = (data?: object) =>
+  http.request<FuturesRT>("post", `${TG_BASE}/futures-positions`, { data });
