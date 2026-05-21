@@ -7,6 +7,9 @@ defineOptions({ name: "StockFutures" });
 const loading = ref(false);
 const dataList = ref<any[]>([]);
 const currentPrice = ref<number | null>(null);
+const initialMargin = ref<number | null>(null);
+const maintainMargin = ref<number | null>(null);
+const maintainWarning = ref<number | null>(null);
 const pagination = reactive({ total: 0, pageSize: 20, currentPage: 1 });
 const searchForm = reactive({ tg_chat_id: "", is_open: "1" });
 
@@ -20,6 +23,9 @@ async function fetchList() {
   dataList.value = res.data?.list ?? [];
   pagination.total = res.data?.total ?? 0;
   currentPrice.value = res.data?.currentPrice ?? null;
+  initialMargin.value = res.data?.initialMargin ?? null;
+  maintainMargin.value = res.data?.maintainMargin ?? null;
+  maintainWarning.value = res.data?.maintainWarning ?? null;
   loading.value = false;
 }
 
@@ -74,6 +80,13 @@ onMounted(fetchList);
           台指現價：{{ currentPrice?.toLocaleString() }}
         </el-tag>
       </el-form-item>
+      <el-form-item v-if="initialMargin">
+        <el-tag type="info" size="large">
+          原始保證金：{{ initialMargin?.toLocaleString() }}
+          ／維持：{{ maintainMargin?.toLocaleString() }}
+          ／警戒線：{{ maintainWarning }}%
+        </el-tag>
+      </el-form-item>
     </el-form>
 
     <el-table v-loading="loading" :data="dataList" border stripe size="small">
@@ -103,6 +116,16 @@ onMounted(fetchList);
           <span :class="diffClass(row.diffAmount)">
             {{ fmtDiff(row.diffAmount, "NT$") }}
           </span>
+        </template>
+      </el-table-column>
+      <el-table-column label="維持率" width="100" align="center">
+        <template #default="{ row }">
+          <span v-if="row.maintainRate !== null"
+            :class="row.maintainWarning && row.maintainRate < row.maintainWarning ? 'text-red-500 font-bold' : ''">
+            {{ row.maintainRate }}%
+            <span v-if="row.maintainWarning && row.maintainRate < row.maintainWarning">⚠️</span>
+          </span>
+          <span v-else>—</span>
         </template>
       </el-table-column>
       <el-table-column label="狀態" width="80" align="center">
