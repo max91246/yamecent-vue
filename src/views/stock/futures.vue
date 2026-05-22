@@ -136,6 +136,16 @@ onMounted(fetchList);
         </template>
       </el-table-column>
       <el-table-column prop="createdAt" label="建倉時間" width="140" />
+      <el-table-column label="平倉點位" width="90" align="right">
+        <template #default="{ row }">
+          {{ row.closePrice?.toLocaleString() ?? "—" }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="closedAt" label="平倉時間" width="140">
+        <template #default="{ row }">
+          {{ row.closedAt ?? "—" }}
+        </template>
+      </el-table-column>
     </el-table>
 
     <div v-if="totalAmount !== null" class="mt-3 flex justify-end">
