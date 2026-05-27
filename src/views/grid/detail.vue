@@ -5,6 +5,12 @@ import { getGridStrategy, getGridOrders, getGridTrades, getGridTicker } from "@/
 
 defineOptions({ name: "GridDetail" });
 
+const quoteMap: Record<string, string> = {
+  btcusdt: "USDT", ethusdt: "USDT",
+  btctwd:  "TWD",  ethtwd:  "TWD",  usdttwd: "TWD"
+};
+const getQuote = (market?: string) => quoteMap[market?.toLowerCase() ?? ""] ?? "USDT";
+
 const route    = useRoute();
 const router   = useRouter();
 const id       = Number(route.params.id);
@@ -64,7 +70,7 @@ onMounted(fetchAll);
           <div class="text-2xl font-bold text-green-600">
             {{ Number(strategy.total_profit ?? 0).toFixed(4) }}
           </div>
-          <div class="text-gray-400 text-sm mt-1">總獲利 (USDT)</div>
+          <div class="text-gray-400 text-sm mt-1">總獲利 ({{ getQuote(strategy?.market) }})</div>
         </el-card>
         <el-card shadow="never" class="text-center">
           <div class="text-2xl font-bold">{{ strategy.filled_count ?? 0 }}</div>

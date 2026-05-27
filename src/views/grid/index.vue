@@ -17,6 +17,15 @@ const loading = ref(false);
 const strategies = ref<any[]>([]);
 const balance = ref<any>(null);
 
+// 依交易對決定計價幣
+const quoteMap: Record<string, string> = {
+  btcusdt: "USDT", ethusdt: "USDT",
+  btctwd:  "TWD",  ethtwd:  "TWD",  usdttwd: "TWD"
+};
+function getQuote(market: string): string {
+  return quoteMap[market?.toLowerCase()] ?? "USDT";
+}
+
 const statusMap: Record<string, { label: string; type: string }> = {
   idle:     { label: "閒置", type: "info" },
   running:  { label: "執行中", type: "success" },
@@ -103,11 +112,11 @@ onMounted(fetchAll);
             <el-descriptions-item label="下限">{{ Number(s.price_lower).toLocaleString() }}</el-descriptions-item>
             <el-descriptions-item label="上限">{{ Number(s.price_upper).toLocaleString() }}</el-descriptions-item>
             <el-descriptions-item label="格數">{{ s.grid_count }}</el-descriptions-item>
-            <el-descriptions-item label="每格">{{ s.amount_per_grid }} USDT</el-descriptions-item>
+            <el-descriptions-item label="每格">{{ s.amount_per_grid }} {{ getQuote(s.market) }}</el-descriptions-item>
             <el-descriptions-item label="已成交">{{ s.filled_count ?? 0 }} 次</el-descriptions-item>
             <el-descriptions-item label="獲利">
               <span :class="Number(s.total_profit) >= 0 ? 'text-green-600' : 'text-red-500'">
-                {{ Number(s.total_profit ?? 0).toFixed(4) }} USDT
+                {{ Number(s.total_profit ?? 0).toFixed(4) }} {{ getQuote(s.market) }}
               </span>
             </el-descriptions-item>
           </el-descriptions>
