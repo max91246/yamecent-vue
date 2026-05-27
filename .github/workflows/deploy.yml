@@ -35,9 +35,6 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Install rsync
-        run: sudo apt-get install -y rsync
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -45,11 +42,14 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.GCP_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Deploy (rsync dist to GCP)
+      - name: Deploy (tar pipe dist to GCP)
         run: |
-          rsync -avz --delete dist/ \
-            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
-            ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }}:/home/max91246/www/yamecent-vue-repo/dist/
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} \
+            "rm -rf /home/max91246/www/yamecent-vue-repo/dist && mkdir -p /home/max91246/www/yamecent-vue-repo/dist"
+          tar czf - -C dist . | ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} \
+            "tar xzf - -C /home/max91246/www/yamecent-vue-repo/dist/"
 
       - name: Notify Telegram (Success)
         if: success()
