@@ -46,10 +46,10 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
             ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} \
-            "rm -rf /home/max91246/www/yamecent-vue-repo/dist && mkdir -p /home/max91246/www/yamecent-vue-repo/dist"
+            "sudo rm -rf /home/max91246/www/yamecent-vue-repo/dist && sudo mkdir -p /home/max91246/www/yamecent-vue-repo/dist"
           tar czf - -C dist . | ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
             ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} \
-            "tar xzf - -C /home/max91246/www/yamecent-vue-repo/dist/"
+            "sudo tar xzf - -C /home/max91246/www/yamecent-vue-repo/dist/"
 
       - name: Notify Telegram (Success)
         if: success()
